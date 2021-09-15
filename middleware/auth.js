@@ -1,8 +1,13 @@
 const jwt = require("jsonwebtoken");
 
 function generateToken(data) {
-  let token = jwt.sign(data, process.env.jwtsecret);
-  return token;
+  let accessToken = jwt.sign(data, process.env.jwtsecret, {
+    expiresIn: process.env.accessTokenLife
+  });
+  let refreshToken = jwt.sign(data, process.env.jwtsecret, {
+    expiresIn: process.env.refreshTokenLife
+  });
+  return { accessToken, refreshToken };
 }
 
 async function verifyToken(req, res, next) {
