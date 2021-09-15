@@ -1,7 +1,11 @@
 let userModel = require("../models/user.model.js");
 const { validatePassword } = require("./../utils/validateString");
 var createError = require("http-errors");
-let auth = require("../middleware/auth");
+const {
+  verifyRefreshToken,
+  generateToken,
+  generateNewToken,
+} = require("../middleware/auth");
 
 async function getAllUser(req, res, next) {
   if (!req.user.role === "administrator") {
@@ -58,6 +62,7 @@ async function login(req, res, next) {
       password: req.body.password,
     };
     let userData = await userModel.getUser(data);
+    console.log(`userData`, userData);
     if (userData === null)
       return res.status(400).send({ message: "User not found" });
     else return res.status(200).send(userData);
@@ -66,4 +71,23 @@ async function login(req, res, next) {
   }
 }
 
-module.exports = { getAllUser, findUser, createUser, login };
+async function refreshToken(req, res, next) {
+  let token = req.body.refreshToken;
+  if (!token) return res.status(400).send({ message: "Token is required" });
+  else {
+    try {
+      let verifier = await verifyRefreshToken(token);
+      console.log(`verifier`, verifier);
+      let tokens = await generateNewToken({
+        username: verifier.username,
+        password: verifier.password,
+      });
+      console.log(`tokens`, tokens);
+      return res.status(200).send({ accessToken: tokens });
+    } catch (e) {
+      return res.status(400).send({ message: "Token is expired" });
+    }
+  }
+}
+
+module.exports = { getAllUser, findUser, createUser, login, refreshToken };

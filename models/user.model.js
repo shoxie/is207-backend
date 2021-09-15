@@ -71,13 +71,15 @@ async function createUser(user) {
 }
 
 async function getUser(user) {
-  let target = await User.findOne({
-    username: user.username,
-    password: user.password,
-  });
-  if (target) {
+  try {
+    let target = await User.findOne({
+      username: user.username,
+      password: user.password,
+    });
     return generateToken(user);
-  } else return null;
+  } catch (e) {
+    return e;
+  }
 }
 
 module.exports = {
