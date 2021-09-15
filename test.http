@@ -1,0 +1,8 @@
+GET http://localhost:3000/users/nigger
+Content-Type: application/json
+authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Im5pZ2dlciIsInBhc3N3b3JkIjoibmkiLCJjcmVhdGVkQXQiOjE1ODI4MTcxNDQzODMsImlhdCI6MTU4MjgxNzE0NH0.DfAJ6wvtyMV9hFWBofymnum8uMlIlWi_ussIBKeeghE
+
+{
+    "username": "nigger",
+    "password":"ni"
+}
