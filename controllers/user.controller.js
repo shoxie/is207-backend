@@ -77,7 +77,6 @@ async function refreshToken(req, res, next) {
   else {
     try {
       let verifier = await verifyRefreshToken(token);
-      console.log(`verifier`, verifier);
       let tokens = await generateNewToken({
         username: verifier.username,
         password: verifier.password,

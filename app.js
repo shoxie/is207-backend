@@ -28,6 +28,8 @@ app.use(express.static(path.join(__dirname, "public")));
 
 var usersRouter = require("./routes/users.route");
 app.use("/api/auth", usersRouter);
+var productsRouter = require("./routes/products.route");
+app.use("/api/products", productsRouter);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
