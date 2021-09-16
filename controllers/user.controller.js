@@ -62,7 +62,6 @@ async function login(req, res, next) {
       password: req.body.password,
     };
     let userData = await userModel.getUser(data);
-    console.log(`userData`, userData);
     if (userData === null)
       return res.status(400).send({ message: "User not found" });
     else return res.status(200).send(userData);

@@ -25,6 +25,14 @@ const productsSchema = new Schema({
     type: Number,
     required: true,
     default: 0,
+    min: 0,
+    validate: {
+        validator: function(val){
+                const currMax = 5;
+                return (currMax !== undefined ? val <= currMax && currMax >= val : true);
+              },
+              message: "The MIN range with value {VALUE} must be in range of [0, 5]!"
+        }
   },
   sku: {
     type: String,
@@ -67,14 +75,13 @@ const increaseQuantity = (id) =>
   Product.findByIdAndUpdate(id, { $inc: { quantity: 1 } });
 
 const getAllProducts = async (perPage, page) => {
-  var data = await  Product.find() // find tất cả các data
-    .skip(perPage * page - perPage) // Trong page đầu tiên sẽ bỏ qua giá trị là 0
+  var data = await  Product.find()
+    .skip(perPage * page - perPage)
     .limit(perPage)
     .exec((err, products) => {
       Product.countDocuments((err, count) => {
-        // đếm để tính có bao nhiêu trang
         if (err) return err;
-        return products; // Trả về dữ liệu các sản phẩm theo định dạng như JSON, XML,...
+        return products; 
       });
     });
   console.log(data);

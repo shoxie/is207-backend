@@ -38,7 +38,12 @@ async function getUser(user) {
       username: user.username,
       password: user.password,
     });
-    return generateToken(user);
+    let tokens = generateToken(user)
+    var data = {
+      ...tokens,
+      username: target.username
+    }
+    return data;
   } catch (e) {
     return e;
   }
