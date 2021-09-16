@@ -4,12 +4,20 @@ function generateToken(data) {
   let accessToken = jwt.sign(data, process.env.jwtsecret, {
     expiresIn: process.env.accessTokenLife
   });
-  let refreshToken = jwt.sign(data, process.env.jwtsecret, {
+  let refreshToken = jwt.sign(data, process.env.refreshTokenSecret, {
     expiresIn: process.env.refreshTokenLife
   });
   return { accessToken, refreshToken };
 }
-
+async function verifyRefreshToken(token) {
+  return await jwt.verify(token, process.env.refreshTokenSecret);
+}
+async function generateNewToken(data) {
+  let accessToken = jwt.sign(data, process.env.jwtsecret, {
+    expiresIn: process.env.accessTokenLife
+  });
+  return accessToken;
+}
 async function verifyToken(req, res, next) {
   // Get auth header value
   const bearerHeader = req.headers["authorization"];
@@ -49,5 +57,7 @@ async function verifyToken(req, res, next) {
 }
 module.exports = {
   generateToken,
-  verifyToken
+  verifyToken,
+  verifyRefreshToken,
+  generateNewToken
 };

@@ -3,6 +3,8 @@ var express = require("express");
 var path = require("path");
 var cookieParser = require("cookie-parser");
 var logger = require("morgan");
+const swaggerJsdoc = require("swagger-jsdoc");
+const swaggerUI = require("swagger-ui-express");
 require("dotenv").config();
 var cors = require('cors')
 var app = express();
@@ -12,7 +14,7 @@ mongoose
     useNewUrlParser: true,
     useUnifiedTopology: true,
     useFindAndModify: false,
-    useCreateIndex: true
+    useCreateIndex: true,
   })
   .then(() => {
     console.log("DATABASE CONNECTED");
@@ -27,14 +29,16 @@ app.use(express.static(path.join(__dirname, "public")));
 app.use(cors())
 var usersRouter = require("./routes/users.route");
 app.use("/api/auth", usersRouter);
+var productsRouter = require("./routes/products.route");
+app.use("/api/products", productsRouter);
 
 // catch 404 and forward to error handler
-app.use(function(req, res, next) {
+app.use(function (req, res, next) {
   next(createError(404));
 });
 
 // error handler
-app.use(function(err, req, res, next) {
+app.use(function (err, req, res, next) {
   // set locals, only providing error in development
   res.locals.message = err.message;
   res.locals.error = req.app.get("env") === "development" ? err : {};
