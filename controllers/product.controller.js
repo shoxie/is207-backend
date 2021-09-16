@@ -1,7 +1,7 @@
 const { getAllProducts, Product } = require("../models/products.model");
 
 async function getAllProduct(req, res, next) {
-  var perPage = 16;
+  var perPage = req.query?.limit || 10;
   var page = req.query?.page || 1;
   Product.find() 
     .skip(perPage * page - perPage) 
