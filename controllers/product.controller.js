@@ -21,7 +21,8 @@ async function getAllProduct(req, res, next) {
 
 async function getProductById(req, res, next) {
   var id = req.query?.id;
-  Product.find({ id }).exec((err, product) => {
+  console.log('id', id)
+  Product.findById(id).exec((err, product) => {
     if (err) return res.status(400).send(err)
     res.status(200).send(product)
   })
@@ -35,8 +36,17 @@ async function searchProduct(req, res, next) {
   })
 }
 
+async function postOneProduct(req, res, next) {
+  let product = new Product(req.body)
+  product.save()
+      .then(result => res.status(200).send({message : 'Create product success'}))
+      .catch(err => res.status(400).send({message: err.message}))
+}
+
 module.exports = {
   getAllProduct,
   getProductById,
-  searchProduct
+  searchProduct,
+  postOneProduct,
+  postOneProduct
 };
