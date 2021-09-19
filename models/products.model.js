@@ -13,9 +13,16 @@ const productsSchema = new Schema({
   salePrice: {
     type: Number,
   },
+  snippet: {
+    type: String,
+    required: true,
+  },
   description: {
     type: String,
     required: true,
+  },
+  howToCook: {
+    type: String,
   },
   image: {
     type: String,
