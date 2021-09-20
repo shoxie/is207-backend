@@ -22,7 +22,7 @@ async function getAllProduct(req, res, next) {
 async function getProductById(req, res, next) {
   var id = req.query?.id;
   console.log('id', id)
-  Product.findById(id).exec((err, product) => {
+  Product.findById(id).populate('category').exec((err, product) => {
     if (err) return res.status(400).send(err)
     res.status(200).send(product)
   })

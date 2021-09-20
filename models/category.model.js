@@ -10,6 +10,10 @@ var categorySchema = new Schema({
         type: String,
         required: true
     },
+    value: {
+        type: String,
+        required: true
+    }
 });
 
 var Category = mongoose.model('Category', categorySchema);

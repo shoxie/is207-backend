@@ -66,20 +66,18 @@ const productsSchema = new Schema({
     type: Number,
     default: 0,
   },
-  category: [
-    {
-      type: Schema.Types.String,
-      ref: "Category",
-      key: "name",
-    },
-  ],
+  category: {
+    type: Schema.Types.ObjectId,
+    ref: "Category",
+  },
+
   tags: [
     {
       type: Schema.Types.String,
       ref: "Tag",
       key: "name",
     },
-  ]
+  ],
 });
 
 var Product = mongoose.model("Products", productsSchema);
