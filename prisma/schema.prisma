@@ -25,7 +25,7 @@ model Product {
   snippet     String
   image       String
   howToCook   String?
-  rating      Int
+  rating      Int? @default(1)
   freshNess   String
   farm        String
   sku         String
