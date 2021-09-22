@@ -1,1 +1,1 @@
-web: node ./bin/www
+web: npx prisma generate && node ./bin/www
