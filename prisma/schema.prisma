@@ -11,7 +11,7 @@ generator client {
   previewFeatures = ["mongodb"]
 }
 
-enum inStock{
+enum inStock {
   inStock
   notInStock
 }
@@ -25,12 +25,12 @@ model Product {
   snippet     String
   image       String
   howToCook   String?
-  rating      Int? @default(1)
+  rating      Int?     @default(1)
   freshNess   String
   farm        String
   sku         String
   origin      String
-  stock       inStock @default(notInStock)
+  stock       inStock  @default(notInStock)
   quantity    Int
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
@@ -54,4 +54,11 @@ model Tag {
   description String
   Product     Product? @relation(fields: [productId], references: [id])
   productId   String?  @db.ObjectId
+}
+
+model User {
+  id       String @id @default(dbgenerated()) @map("_id") @db.ObjectId
+  username String
+  email    String
+  password String
 }

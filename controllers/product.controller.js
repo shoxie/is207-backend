@@ -8,6 +8,9 @@ async function getAllProduct(req, res, next) {
     .findMany({
       take: perPage,
       skip: perPage * (page - 1),
+      include: {
+        category: true,
+      },
     })
     .then((result) => {
       prisma.product.count().then((count) => {
@@ -57,14 +60,16 @@ async function getProductById(req, res, next) {
 
 async function searchProduct(req, res, next) {
   let query = req.query?.q;
-  prisma.product.findMany({
-    where: {
-      name: {
-        contains: query,
+  prisma.product
+    .findMany({
+      where: {
+        name: {
+          contains: query,
+        },
       },
-    }
-  }).then(result => res.status(200).send(result))
-    .catch(err => res.status(400).send(err))
+    })
+    .then((result) => res.status(200).send(result))
+    .catch((err) => res.status(400).send(err));
   // Product.find({ name: { $regex: `${query}`, $options: "i" } }).exec(
   //   (err, products) => {
   //     if (err) return res.status(400).send(err);
@@ -92,10 +97,23 @@ async function postOneProduct(req, res, next) {
     });
 }
 
+function getRelatedProduct(req, res, next) {
+  //function that related products based on name and category
+  let { category } = req.body;
+  prisma.product.findMany({
+    where: {
+      category: {
+        name: category,
+      },
+    },
+  });
+}
+
 module.exports = {
   getAllProduct,
   getProductById,
   searchProduct,
   postOneProduct,
   postOneProduct,
+  getRelatedProduct,
 };

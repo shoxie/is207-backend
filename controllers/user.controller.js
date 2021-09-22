@@ -1,91 +1,93 @@
-let userModel = require("../models/user.model.js");
-const { validatePassword } = require("./../utils/validateString");
+const {
+  validatePassword,
+  validateEmail,
+} = require("./../utils/validateString");
 var createError = require("http-errors");
 const {
   verifyRefreshToken,
   generateToken,
   generateNewToken,
 } = require("../middleware/auth");
+const prisma = require("../models/index");
 
-async function getAllUser(req, res, next) {
-  if (!req.user.role === "administrator") {
-    return next(createError(401, "Unauthorized"));
+function createUser(req, res, next) {
+  const { email, username, password } = req.body;
+  if (!email || !username || !password) {
+    return next(createError(400, "Missing fields"));
   }
   try {
-    let userData = await userModel.getAllUser();
-    res.send(userData);
-  } catch (e) {
-    res.send(e);
-  }
-}
-async function findUser(req, res, next) {
-  try {
-    let userData = await userModel.getUser({ username: req.params.username });
-    res.send(userData);
-  } catch (e) {
-    res.send(e);
-  }
-}
-async function createUser(req, res, next) {
-  let password = req.body.password;
-  let validate;
-  if (!password) {
-    return res.status(400).send({
-      message: "Password is required",
-    });
-  } else if (password && password.includes(" ")) {
-    return res.status(400).send({
-      message: "Password cannot contain spaces",
-    });
-  } else if (!validatePassword(password)) {
-    return res.status(400).send({
-      message:
-        "Password must contain at least 8 characters, including atleast 1 number",
-    });
-  } else {
-    try {
-      let data = {
-        username: req.body.username,
-        password: req.body.password,
-      };
-      let token = await userModel.createUser(data);
-      res.status(200).send(token);
-    } catch (e) {
-      res.send(e);
+    const emailCheck = validateEmail(email);
+    if (password.length < 8) {
+      return res
+        .status(400)
+        .send({ message: "Password must be at least 8 characters long" });
     }
-  }
-}
-async function login(req, res, next) {
-  try {
-    let data = {
-      username: req.body.username,
-      password: req.body.password,
-    };
-    let userData = await userModel.getUser(data);
-    if (userData === null)
-      return res.status(400).send({ message: "User not found" });
-    else return res.status(200).send(userData);
-  } catch (error) {
-    res.send(error);
-  }
-}
-
-async function refreshToken(req, res, next) {
-  let token = req.body.refreshToken;
-  if (!token) return res.status(400).send({ message: "Token is required" });
-  else {
-    try {
-      let verifier = await verifyRefreshToken(token);
-      let tokens = await generateNewToken({
-        username: verifier.username,
-        password: verifier.password,
+    if (!emailCheck) {
+      return res.status(400).send({ message: "Email is not valid" });
+    }
+    prisma.user
+      .create({ data: req.body })
+      .then((result) => {
+        let tokens = generateToken(result.username, result.password);
+        return res
+          .status(201)
+          .send({ message: `User ${result.username} created`, tokens });
+      })
+      .catch((err) => {
+        return res.status(400).send({ message: err.message });
       });
-      console.log(`tokens`, tokens);
-      return res.status(200).send({ accessToken: tokens });
-    } catch (e) {
-      return res.status(400).send({ message: "Token is expired" });
-    }
+  } catch (err) {
+    res.status(400).send({ message: err.message });
   }
 }
 
-module.exports = { getAllUser, findUser, createUser, login, refreshToken };
+function login(req, res, next) {
+  const { email, username, password } = req.body;
+  prisma.user
+    .findFirst({
+      where: {
+        OR: [
+          {
+            email: {
+              equals: email,
+            },
+          },
+          {
+            username: {
+              equals: username,
+            },
+          },
+        ],
+        password: {
+          equals: password,
+        },
+      },
+    })
+    .then((result) => {
+      let { accessToken, refreshToken } = generateToken({
+        username: result.username,
+        password: result.password,
+      });
+      return res
+        .status(200)
+        .send({ username: result.username, accessToken, refreshToken });
+    })
+    .catch((err) => res.status(400).send({ message: err.message }));
+}
+
+function refreshToken(req, res, next) {
+  if (!req.body.refreshToken) {
+    return res.status(400).send({ message: "Missing refresh token" });
+  }
+
+  try {
+    let user = verifyRefreshToken(req.body.refreshToken);
+    console.log(`user`, user);
+    let { accessToken, refreshToken } = generateNewToken(user);
+    return res.status(200).send({ user });
+  } catch (err) {
+    return res.status(400).send({ message: "Refresh token expired" });
+  }
+}
+
+module.exports = { createUser, login, refreshToken };

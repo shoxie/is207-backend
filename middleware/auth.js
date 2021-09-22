@@ -2,10 +2,10 @@ const jwt = require("jsonwebtoken");
 
 function generateToken(data) {
   let accessToken = jwt.sign(data, process.env.jwtsecret, {
-    expiresIn: process.env.accessTokenLife
+    expiresIn: process.env.accessTokenLife,
   });
   let refreshToken = jwt.sign(data, process.env.refreshTokenSecret, {
-    expiresIn: process.env.refreshTokenLife
+    expiresIn: process.env.refreshTokenLife,
   });
   return { accessToken, refreshToken };
 }
@@ -14,7 +14,7 @@ async function verifyRefreshToken(token) {
 }
 async function generateNewToken(data) {
   let accessToken = jwt.sign(data, process.env.jwtsecret, {
-    expiresIn: process.env.accessTokenLife
+    expiresIn: process.env.accessTokenLife,
   });
   return accessToken;
 }
@@ -59,5 +59,5 @@ module.exports = {
   generateToken,
   verifyToken,
   verifyRefreshToken,
-  generateNewToken
+  generateNewToken,
 };
