@@ -1,5 +1,6 @@
 const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
+fs = require("fs");
 var data = {
   category: {
     connectOrCreate: {
@@ -32,7 +33,30 @@ var data = {
   stock: "inStock",
 };
 async function main() {
-  prisma.product.create({ data: data }).then(() => console.log(1));
+  var name = "data.json";
+  var dataFile = JSON.parse(fs.readFileSync(name).toString());
+
+  var args = process.argv.slice(2);
+  if (args[0] === "--trim") {
+    dataFile.forEach(function (p) {
+      if (p.id) delete p.id;
+      p.price = parseInt(p.price);
+      p.salePrice = parseInt(p.salePrice);
+      p.categoryId = "6149807b00e62e0f0017bba5"
+    });
+    fs.writeFileSync(name, JSON.stringify(dataFile));
+  }
+  if (args[0] === "--import") {
+    dataFile.forEach(async function (p) {
+      await prisma.product
+        .create({
+          data: p,
+        })
+        .then(() => console.log("Product created"))
+        .catch((e) => console.log(e));
+    });
+  }
+  // prisma.product.create({ data: data }).then(() => console.log(1));
   // ... you will write your Prisma Client queries here
 }
 main()
