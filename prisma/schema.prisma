@@ -16,6 +16,11 @@ enum inStock {
   notInStock
 }
 
+enum userRole {
+  admin
+  user
+}
+
 model Product {
   id          String   @id @default(dbgenerated()) @map("_id") @db.ObjectId
   name        String
@@ -57,8 +62,9 @@ model Tag {
 }
 
 model User {
-  id       String @id @default(dbgenerated()) @map("_id") @db.ObjectId
+  id       String   @id @default(dbgenerated()) @map("_id") @db.ObjectId
   username String
   email    String
   password String
+  role     userRole
 }
