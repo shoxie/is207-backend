@@ -63,8 +63,8 @@ model Tag {
 
 model User {
   id       String   @id @default(dbgenerated()) @map("_id") @db.ObjectId
-  username String
-  email    String
+  username String   @unique
+  email    String   @unique
   password String
-  role     userRole
+  role     userRole @default(user)
 }

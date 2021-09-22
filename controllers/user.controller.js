@@ -28,7 +28,11 @@ function createUser(req, res, next) {
     prisma.user
       .create({ data: req.body })
       .then((result) => {
-        let tokens = generateToken(result.username, result.password);
+        let tokens = generateToken({
+          username: result.username,
+          password: result.password,
+          role: result.role,
+        });
         return res
           .status(201)
           .send({ message: `User ${result.username} created`, tokens });
@@ -67,10 +71,14 @@ function login(req, res, next) {
       let { accessToken, refreshToken } = generateToken({
         username: result.username,
         password: result.password,
+        role: result.role,
       });
-      return res
-        .status(200)
-        .send({ username: result.username, accessToken, refreshToken });
+      return res.status(200).send({
+        username: result.username,
+        role: result.role,
+        accessToken,
+        refreshToken,
+      });
     })
     .catch((err) => res.status(400).send({ message: err.message }));
 }
@@ -85,6 +93,7 @@ async function refreshToken(req, res, next) {
     let accessToken = await generateNewToken({
       username: user.username,
       password: user.password,
+      role: user.role,
     });
     return res.status(200).send({ accessToken });
   } catch (err) {
