@@ -75,16 +75,18 @@ function login(req, res, next) {
     .catch((err) => res.status(400).send({ message: err.message }));
 }
 
-function refreshToken(req, res, next) {
+async function refreshToken(req, res, next) {
   if (!req.body.refreshToken) {
     return res.status(400).send({ message: "Missing refresh token" });
   }
 
   try {
-    let user = verifyRefreshToken(req.body.refreshToken);
-    console.log(`user`, user);
-    let { accessToken, refreshToken } = generateNewToken(user);
-    return res.status(200).send({ user });
+    let user = await verifyRefreshToken(req.body.refreshToken);
+    let accessToken = await generateNewToken({
+      username: user.username,
+      password: user.password,
+    });
+    return res.status(200).send({ accessToken });
   } catch (err) {
     return res.status(400).send({ message: "Refresh token expired" });
   }
