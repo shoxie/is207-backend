@@ -2,14 +2,36 @@ const { getAllProducts, Product } = require("../models/products.model");
 const prisma = require("../models/index");
 
 async function getAllProduct(req, res, next) {
-  var perPage = req.query?.limit || 10;
-  var page = req.query?.page || 1;
+  var perPage = parseInt(req.query?.limit) || 10;
+  var page = parseInt(req.query?.page) || 1;
+  var maxPrice = parseInt(req.body?.maxPrice) || undefined;
+  var minPrice = parseInt(req.body?.minPrice) || undefined;
+  var categories = req.body?.category || undefined;
   prisma.product
     .findMany({
       take: perPage,
       skip: perPage * (page - 1),
       include: {
         category: true,
+      },
+      where: {
+        category: {
+          name: {
+            in: categories,
+          },
+        },
+        AND: [
+          {
+            price: {
+              lte: maxPrice,
+            },
+          },
+          {
+            price: {
+              gte: minPrice,
+            },
+          },
+        ],
       },
     })
     .then((result) => {
@@ -99,8 +121,8 @@ function getRelatedProduct(req, res, next) {
     })
     .then((result) => res.status(200).send(result))
     .catch((err) => {
-      console.log('err', err)
-      res.status(400).send(err)
+      console.log("err", err);
+      res.status(400).send(err);
     });
 }
 
