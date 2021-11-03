@@ -22,7 +22,7 @@ enum userRole {
 }
 
 model Product {
-  id          String   @id @default(dbgenerated()) @map("_id") @db.ObjectId
+  id          String        @id @default(dbgenerated()) @map("_id") @db.ObjectId
   name        String
   price       Int
   salePrice   Int?
@@ -30,24 +30,26 @@ model Product {
   snippet     String
   image       String
   howToCook   String?
-  rating      Int?     @default(1)
+  rating      Int?          @default(1)
   freshNess   String
   farm        String
   sku         String
   origin      String
-  stock       inStock  @default(notInStock)
+  stock       inStock       @default(notInStock)
   quantity    Int
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  category    Category @relation(fields: [categoryId], references: [id])
-  categoryId  String   @db.ObjectId
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  category    Category      @relation(fields: [categoryId], references: [id])
+  categoryId  String        @db.ObjectId
   tags        Tag[]
+  OrderDetail OrderDetail[]
 }
 
 model Category {
   id          String    @id @default(dbgenerated()) @map("_id") @db.ObjectId
   name        String
   description String
+  slug        String?
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
   Product     Product[]
@@ -67,4 +69,35 @@ model User {
   email    String   @unique
   password String
   role     userRole @default(user)
+  orders   Order[]
+}
+
+model Order {
+  id               String         @id @default(dbgenerated()) @map("_id") @db.ObjectId
+  userId           String         @db.ObjectId
+  total            Int
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @updatedAt
+  User             User           @relation(fields: [userId], references: [id])
+  orderDetail      OrderDetail[]
+  shippingMethod   ShippingMethod? @relation(fields: [shippingMethodId], references: [id])
+  shippingMethodId String?         @db.ObjectId
+}
+
+model OrderDetail {
+  id        String  @id @default(dbgenerated()) @map("_id") @db.ObjectId
+  price     Int
+  quantity  Int
+  product   Product @relation(fields: [productId], references: [id])
+  productId String  @db.ObjectId
+  Order     Order?  @relation(fields: [orderId], references: [id])
+  orderId   String? @db.ObjectId
+}
+
+model ShippingMethod {
+  id    String  @id @default(dbgenerated()) @map("_id") @db.ObjectId
+  name  String
+  price Int
+  logo  String
+  Order Order[]
 }

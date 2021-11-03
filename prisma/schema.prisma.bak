@@ -1,0 +1,71 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["mongodb"]
+}
+
+enum inStock {
+  inStock
+  notInStock
+}
+
+enum userRole {
+  admin
+  user
+}
+
+model Product {
+  id          String   @id @default(dbgenerated()) @map("_id") @db.ObjectId
+  name        String
+  price       Int
+  salePrice   Int?
+  description String
+  snippet     String
+  image       String
+  howToCook   String?
+  rating      Int?     @default(1)
+  freshNess   String
+  farm        String
+  sku         String
+  origin      String
+  stock       inStock  @default(notInStock)
+  quantity    Int
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  category    Category? @relation(fields: [categoryId], references: [id])
+  categoryId  String?   @db.ObjectId
+  tags        Tag[]
+}
+
+model Category {
+  id          String    @id @default(dbgenerated()) @map("_id") @db.ObjectId
+  name        String
+  description String
+  slug        String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  Product     Product[]
+}
+
+model Tag {
+  id          String   @id @default(dbgenerated()) @map("_id") @db.ObjectId
+  name        String
+  description String
+  Product     Product? @relation(fields: [productId], references: [id])
+  productId   String?  @db.ObjectId
+}
+
+model User {
+  id       String   @id @default(dbgenerated()) @map("_id") @db.ObjectId
+  username String   @unique
+  email    String   @unique
+  password String
+  role     userRole @default(user)
+}

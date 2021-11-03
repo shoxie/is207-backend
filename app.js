@@ -32,7 +32,9 @@ app.use("/api/auth", usersRouter);
 var productsRouter = require("./routes/products.route");
 app.use("/api/products", productsRouter);
 var categoryRouter = require("./routes/categories.route");
-app.use("/api/category", categoryRouter);
+app.use("/api/categories", categoryRouter);
+var orderRouter = require("./routes/orders.route");
+app.use("/api/orders", orderRouter);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {

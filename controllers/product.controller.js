@@ -2,11 +2,12 @@ const { getAllProducts, Product } = require("../models/products.model");
 const prisma = require("../models/index");
 
 async function getAllProduct(req, res, next) {
+  console.log(`req.query`, req.query)
   var perPage = parseInt(req.query?.limit) || 10;
   var page = parseInt(req.query?.page) || 1;
-  var maxPrice = parseInt(req.body?.maxPrice) || undefined;
-  var minPrice = parseInt(req.body?.minPrice) || undefined;
-  var categories = req.body?.category || undefined;
+  var maxPrice = parseInt(req.query?.maxPrice) || undefined;
+  var minPrice = parseInt(req.query?.minPrice) || undefined;
+  var slug = req.query?.slug || undefined;
   prisma.product
     .findMany({
       take: perPage,
@@ -16,9 +17,7 @@ async function getAllProduct(req, res, next) {
       },
       where: {
         category: {
-          name: {
-            in: categories,
-          },
+          slug: slug,
         },
         AND: [
           {
@@ -35,7 +34,13 @@ async function getAllProduct(req, res, next) {
       },
     })
     .then((result) => {
-      prisma.product.count().then((count) => {
+      prisma.product.count({
+        where: {
+          category: {
+            slug: slug,
+          },
+        },
+      }).then((count) => {
         res.status(200).json({
           data: result,
           total: count,
@@ -126,6 +131,52 @@ function getRelatedProduct(req, res, next) {
     });
 }
 
+function getTotalCount(req, res, next) {
+  prisma.product.count().then((count) => {
+    res.status(200).json(count);
+  })
+}
+
+function getAllBySlug(req, res, next) {
+  let slug = req.query?.slug || undefined;
+  var perPage = parseInt(req.query?.limit) || 10;
+  var page = parseInt(req.query?.page) || 1;
+  var maxPrice = parseInt(req.body?.maxPrice) || undefined;
+  var minPrice = parseInt(req.body?.minPrice) || undefined;
+  prisma.product
+    .findMany({
+      take: perPage,
+      skip: perPage * (page - 1),
+      where: {
+        category: {
+          slug: slug,
+        }
+      },
+      include: {
+        category: true,
+      }
+    })
+    .then((result) => {
+      // console.log(`result`, result)
+      prisma.product.count({
+        where: {
+          category: {
+            slug: slug,
+          }
+        }
+      }).then((count) => {
+        res.status(200).json({
+          data: result,
+          total: count,
+          pages: Math.ceil(count / perPage),
+        });
+      });
+    })
+    .catch((err) => {
+      res.status(400).send(err);
+    });
+}
+
 module.exports = {
   getAllProduct,
   getProductById,
@@ -133,4 +184,6 @@ module.exports = {
   postOneProduct,
   postOneProduct,
   getRelatedProduct,
+  getTotalCount,
+  getAllBySlug,
 };

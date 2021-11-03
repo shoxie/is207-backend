@@ -74,6 +74,7 @@ function login(req, res, next) {
         role: result.role,
       });
       return res.status(200).send({
+        id: result.id,
         username: result.username,
         role: result.role,
         accessToken,
