@@ -32,6 +32,7 @@ async function createOrder(req, res, next) {
   prisma.order
     .create({
       data: {
+        ...data.userDetail,
         userId: data.userId,
         shippingMethodId: data.shippingMethodId,
         orderDetail: {
@@ -72,7 +73,30 @@ async function getShippingMethods(req, res, next) {
     .then((result) => res.status(200).send(result))
     .catch((err) => res.status(400).send(err));
 }
+
+async function getUserOrders(req, res, next) {
+  prisma.order.findMany({
+    where: {
+      userId: req.query.id,
+    },
+    include: {
+      orderDetail: {
+        include: {
+          product: true,
+        },
+      }
+      },
+  }).then((result) => {
+    res.status(200).send(result)
+    
+  }).catch((err) => {
+    console.log(`err`, err)
+    res.status(400).send(err)
+  });
+}
+
 module.exports = {
   createOrder,
   getShippingMethods,
+  getUserOrders
 };

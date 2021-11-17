@@ -73,15 +73,23 @@ model User {
 }
 
 model Order {
-  id               String         @id @default(dbgenerated()) @map("_id") @db.ObjectId
-  userId           String         @db.ObjectId
+  id               String          @id @default(dbgenerated()) @map("_id") @db.ObjectId
+  userId           String          @db.ObjectId
   total            Int
-  createdAt        DateTime       @default(now())
-  updatedAt        DateTime       @updatedAt
-  User             User           @relation(fields: [userId], references: [id])
+  createdAt        DateTime        @default(now())
+  updatedAt        DateTime        @updatedAt
+  User             User            @relation(fields: [userId], references: [id])
   orderDetail      OrderDetail[]
   shippingMethod   ShippingMethod? @relation(fields: [shippingMethodId], references: [id])
   shippingMethodId String?         @db.ObjectId
+  firstName        String
+  lastName         String
+  address          String
+  city             String
+  zip              String
+  country          String
+  phone            String
+  email            String
 }
 
 model OrderDetail {
@@ -90,7 +98,7 @@ model OrderDetail {
   quantity  Int
   product   Product @relation(fields: [productId], references: [id])
   productId String  @db.ObjectId
-  Order     Order?  @relation(fields: [orderId], references: [id])
+  Order     Order?  @relation(fields: [orderId], references: [id], onDelete: Cascade)
   orderId   String? @db.ObjectId
 }
 
@@ -100,4 +108,11 @@ model ShippingMethod {
   price Int
   logo  String
   Order Order[]
+}
+
+model Banner {
+  id         String @id @default(dbgenerated()) @map("_id") @db.ObjectId
+  heading    String
+  subHeading String
+  imgUrl     String
 }
