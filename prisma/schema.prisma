@@ -21,6 +21,12 @@ enum userRole {
   user
 }
 
+enum orderStatus {
+  pending
+  shipping
+  delivered
+}
+
 model Product {
   id          String        @id @default(dbgenerated()) @map("_id") @db.ObjectId
   name        String
@@ -90,6 +96,7 @@ model Order {
   country          String
   phone            String
   email            String
+  status           orderStatus     @default(pending)
 }
 
 model OrderDetail {
