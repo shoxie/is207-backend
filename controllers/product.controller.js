@@ -4,9 +4,12 @@ const prisma = require("../models/index");
 async function getAllProduct(req, res, next) {
   var perPage = parseInt(req.query?.limit) || 10;
   var page = parseInt(req.query?.page) || 1;
-  var maxPrice = parseInt(req.query?.maxPrice) || undefined;
-  var minPrice = parseInt(req.query?.minPrice) || undefined;
+  var filter = JSON.parse(req.query.filter)
+  var maxPrice = parseInt(filter.maxPrice) || undefined;
+  var minPrice = parseInt(filter.minPrice) || undefined;
   var slug = req.query?.slug || undefined;
+  var ratingFilter = filter?.rating ? filter.rating.map(item => parseInt(item)) : undefined
+
   prisma.product
     .findMany({
       take: perPage,
@@ -30,6 +33,9 @@ async function getAllProduct(req, res, next) {
             },
           },
         ],
+        rating: {
+          in: ratingFilter
+        }
       },
     })
     .then((result) => {
