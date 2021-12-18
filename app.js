@@ -26,7 +26,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "public")));
-app.use(cors())
+app.use(cors({ origin : "*"}))
 var usersRouter = require("./routes/users.route");
 app.use("/api/auth", usersRouter);
 
@@ -41,6 +41,9 @@ app.use("/api/orders", orderRouter);
 
 var bannerRouter = require("./routes/banners.route");
 app.use("/api/banner", bannerRouter);
+
+var blogRouter = require("./routes/blogs.route");
+app.use("/api/blogs", blogRouter);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {

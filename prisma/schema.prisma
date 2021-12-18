@@ -123,3 +123,15 @@ model Banner {
   subHeading String
   imgUrl     String
 }
+
+model Blog {
+  id         String   @id @default(dbgenerated()) @map("_id") @db.ObjectId
+  title      String
+  subHeading String?
+  imgUrl     String
+  content    String
+  author     String
+  category   String
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}

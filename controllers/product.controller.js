@@ -2,7 +2,6 @@ const { getAllProducts, Product } = require("../models/products.model");
 const prisma = require("../models/index");
 
 async function getAllProduct(req, res, next) {
-  console.log(`req.query`, req.query)
   var perPage = parseInt(req.query?.limit) || 10;
   var page = parseInt(req.query?.page) || 1;
   var maxPrice = parseInt(req.query?.maxPrice) || undefined;
@@ -81,12 +80,19 @@ async function searchProduct(req, res, next) {
 }
 
 async function postOneProduct(req, res, next) {
+  var product = {
+    ...req.body,
+    price: parseInt(req.body?.price),
+    salePrice: parseInt(req.body?.salePrice || undefined),
+    quantity: parseInt(req.body?.quantity),
+  }
   prisma.product
-    .create({ data: req.body })
+    .create({ data: product })
     .then((result) => {
       res.status(200).send({ message: "Create product success" });
     })
     .catch((err) => {
+      console.log(`err`, err)
       res.status(400).send({ message: err.message });
     });
 }

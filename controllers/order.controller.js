@@ -85,10 +85,30 @@ async function getUserOrders(req, res, next) {
           product: true,
         },
       }
-      },
+    },
   }).then((result) => {
     res.status(200).send(result)
-    
+
+  }).catch((err) => {
+    console.log(`err`, err)
+    res.status(400).send(err)
+  });
+}
+
+async function getAllOrders(req, res, next) {
+  prisma.order.findMany({
+    include: {
+      orderDetail: {
+        include: {
+          product: true,
+        },
+      },
+      shippingMethod: true,
+      User: true
+    },
+  }).then((result) => {
+    res.status(200).send(result)
+
   }).catch((err) => {
     console.log(`err`, err)
     res.status(400).send(err)
@@ -98,5 +118,6 @@ async function getUserOrders(req, res, next) {
 module.exports = {
   createOrder,
   getShippingMethods,
-  getUserOrders
+  getUserOrders,
+  getAllOrders
 };
