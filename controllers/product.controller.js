@@ -4,7 +4,13 @@ const prisma = require('../models/index')
 async function getAllProduct(req, res, next) {
   var result = null
   try {
-    result = await prisma.product.findMany()
+    if (req.query.id) {
+      result = await prisma.product.findUnique({
+        where: {
+          id: req.query.id
+        }
+      })
+    } else result = await prisma.product.findMany()
   } catch (error) {
     next(error)
     return null
