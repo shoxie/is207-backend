@@ -42,7 +42,7 @@ model Product {
 model Category {
   id          String    @id @default(dbgenerated()) @map("_id") @db.ObjectId
   name        String
-  description String
+  description String?
   slug        String?
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
@@ -69,7 +69,7 @@ model User {
 model Order {
   id               String          @id @default(dbgenerated()) @map("_id") @db.ObjectId
   userId           String          @db.ObjectId
-  total            Int
+  total            Int?
   createdAt        DateTime        @default(now())
   updatedAt        DateTime        @updatedAt
   User             User            @relation(fields: [userId], references: [id])
@@ -82,6 +82,7 @@ model Order {
   city             String
   zip              String
   country          String
+  fax               String
   phone            String
   email            String
   status           orderStatus     @default(pending)
