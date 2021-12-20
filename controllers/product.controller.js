@@ -2,57 +2,17 @@ const { getAllProducts, Product } = require("../models/products.model");
 const prisma = require("../models/index");
 
 async function getAllProduct(req, res, next) {
-  var perPage = parseInt(req.query?.limit) || 10;
-  var page = parseInt(req.query?.page) || 1;
-  var filter = JSON.parse(req.query.filter)
-  var maxPrice = parseInt(filter.maxPrice) || undefined;
-  var minPrice = parseInt(filter.minPrice) || undefined;
-  var slug = req.query?.slug || undefined;
-  var ratingFilter = filter?.rating ? filter.rating.map(item => parseInt(item)) : undefined
-
-  prisma.product
-    .findMany({
-      take: perPage,
-      skip: perPage * (page - 1),
-      include: {
-        category: true,
-      },
-      where: {
-        category: {
-          slug: slug,
-        },
-        AND: [
-          {
-            price: {
-              lte: maxPrice,
-            },
-          },
-          {
-            price: {
-              gte: minPrice,
-            },
-          },
-        ],
-        rating: {
-          in: ratingFilter
-        }
-      },
-    })
-    .then((result) => {
-      prisma.product.count({
-        where: {
-          category: {
-            slug: slug,
-          },
-        },
-      }).then((count) => {
-        res.status(200).json({
-          data: result,
-          total: count,
-          pages: Math.ceil(count / perPage),
-        });
-      });
-    });
+  var result = null 
+  try {
+    result = await prisma.product.findMany()
+  } catch (error) {
+    next(error)
+    return null
+  }
+  res.status(200).json({
+    status: 200,
+    data: result
+  });
 }
 
 async function getProductById(req, res, next) {
