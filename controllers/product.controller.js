@@ -4,7 +4,7 @@ const prisma = require("../models/index");
 async function getAllProduct(req, res, next) {
   var perPage = parseInt(req.query?.limit) || 10;
   var page = parseInt(req.query?.page) || 1;
-  var filter = JSON.parse(req.query.filter)
+  var filter = req.query.filter ? JSON.parse(req.query.filter) : {}
   var maxPrice = parseInt(filter.maxPrice) || undefined;
   var minPrice = parseInt(filter.minPrice) || undefined;
   var slug = req.query?.slug || undefined;
@@ -37,6 +37,9 @@ async function getAllProduct(req, res, next) {
           in: ratingFilter
         }
       },
+      orderBy: {
+        createdAt: "desc",
+      }
     })
     .then((result) => {
       prisma.product.count({
@@ -89,8 +92,8 @@ async function postOneProduct(req, res, next) {
   var product = {
     ...req.body,
     price: parseInt(req.body?.price),
-    salePrice: parseInt(req.body?.salePrice || undefined),
-    quantity: parseInt(req.body?.quantity),
+    salePrice: req.body?.salePrice ? parseInt(req.body?.salePrice) : undefined,
+    quantity: req.body?.quantity ? parseInt(req.body?.quantity) : undefined,
   }
   prisma.product
     .create({ data: product })

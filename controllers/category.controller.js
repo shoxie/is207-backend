@@ -3,7 +3,11 @@ const prisma = require("../models/index");
 
 async function getAllCategory(req, res, next) {
   prisma.category
-    .findMany()
+    .findMany({
+      include: {
+        Product: true,
+      }
+    })
     .then((categories) => {
       res.status(200).json(categories);
     })
@@ -27,7 +31,10 @@ async function postNewCategory(req, res, next) {
     .then(() =>
       res.status(200).send({ message: "Crate category successfully" })
     )
-    .catch((error) => res.status(400).send({ message: error.name }));
+    .catch((error) =>{
+      console.log(error)
+      res.status(400).send({ message: error.name })
+    });
 }
 
 async function getCategoryBySlug(req, res, next) {
